@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- API référence Core ET Infrastructure. -->
+    <ProjectReference Include="..\MediCareManager.Core\MediCareManager.Core.csproj" />
+    <ProjectReference Include="..\MediCareManager.Infrastructure\MediCareManager.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
