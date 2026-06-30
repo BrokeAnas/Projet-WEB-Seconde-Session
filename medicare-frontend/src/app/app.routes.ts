@@ -21,23 +21,23 @@ export const routes: Routes = [
 
   // Patients
   { path: 'patients', component: PatientListComponent, canActivate: [authGuard] },
-  { path: 'patients/new', component: PatientFormComponent, canActivate: [() => roleGuard('secretaire', 'admin')()] },
+  { path: 'patients/new', component: PatientFormComponent, canActivate: [(route, state) => roleGuard('secretaire', 'admin')(route, state)] },
   { path: 'patients/:id', component: PatientDetailComponent, canActivate: [authGuard] },
-  { path: 'patients/:id/edit', component: PatientFormComponent, canActivate: [() => roleGuard('secretaire', 'admin')()] },
+  { path: 'patients/:id/edit', component: PatientFormComponent, canActivate: [(route, state) => roleGuard('secretaire', 'admin')(route, state)] },
 
   // Agenda
   { path: 'agenda', component: AgendaComponent, canActivate: [authGuard] },
 
   // Paiements
-  { path: 'paiements', component: PaiementListComponent, canActivate: [() => roleGuard('secretaire', 'admin')()] },
-  { path: 'paiements/audit', component: AuditLogComponent, canActivate: [() => roleGuard('admin')()] },
+  { path: 'paiements', component: PaiementListComponent, canActivate: [(route, state) => roleGuard('secretaire', 'admin')(route, state)] },
+  { path: 'paiements/audit', component: AuditLogComponent, canActivate: [(route, state) => roleGuard('admin')(route, state)] },
 
   // Personnel
   { path: 'personnel/medecins', component: MedecinListComponent, canActivate: [authGuard] },
-  { path: 'personnel/secretaires', component: SecretaireListComponent, canActivate: [() => roleGuard('admin')()] },
+  { path: 'personnel/secretaires', component: SecretaireListComponent, canActivate: [(route, state) => roleGuard('admin')(route, state)] },
 
   // Administration
-  { path: 'administration', component: AdministrationComponent, canActivate: [() => roleGuard('admin')()] },
+  { path: 'administration', component: AdministrationComponent, canActivate: [(route, state) => roleGuard('admin')(route, state)] },
 
   { path: '**', redirectTo: 'dashboard' }
 ];
