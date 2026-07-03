@@ -1,6 +1,6 @@
 using Dapper;
-using MediCareManager.Core.DTOs;
-using MediCareManager.Core.Interfaces.Repositories;
+using MediCareManager.Core.Models;
+using MediCareManager.Infrastructure.Repositories.Abstractions;
 
 namespace MediCareManager.Infrastructure.Repositories;
 

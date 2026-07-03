@@ -1,43 +1,43 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
-import { roleGuard } from './core/guards/role.guard';
+import { authGuard } from './services/auth.guard';
+import { roleGuard } from './services/role.guard';
 
-import { LoginComponent } from './features/auth/login/login.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { PatientListComponent } from './features/patients/patient-list/patient-list.component';
-import { PatientDetailComponent } from './features/patients/patient-detail/patient-detail.component';
-import { PatientFormComponent } from './features/patients/patient-form/patient-form.component';
-import { AgendaComponent } from './features/agenda/agenda/agenda.component';
-import { PaiementListComponent } from './features/paiements/paiement-list/paiement-list.component';
-import { AuditLogComponent } from './features/paiements/audit-log/audit-log.component';
-import { MedecinListComponent } from './features/personnel/medecin-list/medecin-list.component';
-import { SecretaireListComponent } from './features/personnel/secretaire-list/secretaire-list.component';
-import { AdministrationComponent } from './features/administration/administration.component';
+import { LoginPageComponent } from './pages/login-page/login-page.component';
+import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
+import { PatientsPageComponent } from './pages/patients-page/patients-page.component';
+import { PatientDetailPageComponent } from './pages/patient-detail-page/patient-detail-page.component';
+import { PatientFormPageComponent } from './pages/patient-form-page/patient-form-page.component';
+import { AgendaPageComponent } from './pages/agenda-page/agenda-page.component';
+import { PaiementsPageComponent } from './pages/paiements-page/paiements-page.component';
+import { AuditPageComponent } from './pages/audit-page/audit-page.component';
+import { MedecinsPageComponent } from './pages/medecins-page/medecins-page.component';
+import { SecretairesPageComponent } from './pages/secretaires-page/secretaires-page.component';
+import { AdministrationPageComponent } from './pages/administration-page/administration-page.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'login', component: LoginPageComponent },
+  { path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard] },
 
   // Patients
-  { path: 'patients', component: PatientListComponent, canActivate: [authGuard] },
-  { path: 'patients/new', component: PatientFormComponent, canActivate: [(route, state) => roleGuard('secretaire', 'admin')(route, state)] },
-  { path: 'patients/:id', component: PatientDetailComponent, canActivate: [authGuard] },
-  { path: 'patients/:id/edit', component: PatientFormComponent, canActivate: [(route, state) => roleGuard('secretaire', 'admin')(route, state)] },
+  { path: 'patients', component: PatientsPageComponent, canActivate: [authGuard] },
+  { path: 'patients/new', component: PatientFormPageComponent, canActivate: [(route, state) => roleGuard('secretaire', 'admin')(route, state)] },
+  { path: 'patients/:id', component: PatientDetailPageComponent, canActivate: [authGuard] },
+  { path: 'patients/:id/edit', component: PatientFormPageComponent, canActivate: [(route, state) => roleGuard('secretaire', 'admin')(route, state)] },
 
   // Agenda
-  { path: 'agenda', component: AgendaComponent, canActivate: [authGuard] },
+  { path: 'agenda', component: AgendaPageComponent, canActivate: [authGuard] },
 
   // Paiements
-  { path: 'paiements', component: PaiementListComponent, canActivate: [(route, state) => roleGuard('secretaire', 'admin')(route, state)] },
-  { path: 'paiements/audit', component: AuditLogComponent, canActivate: [(route, state) => roleGuard('admin')(route, state)] },
+  { path: 'paiements', component: PaiementsPageComponent, canActivate: [(route, state) => roleGuard('secretaire', 'admin')(route, state)] },
+  { path: 'paiements/audit', component: AuditPageComponent, canActivate: [(route, state) => roleGuard('admin')(route, state)] },
 
   // Personnel
-  { path: 'personnel/medecins', component: MedecinListComponent, canActivate: [authGuard] },
-  { path: 'personnel/secretaires', component: SecretaireListComponent, canActivate: [(route, state) => roleGuard('admin')(route, state)] },
+  { path: 'personnel/medecins', component: MedecinsPageComponent, canActivate: [authGuard] },
+  { path: 'personnel/secretaires', component: SecretairesPageComponent, canActivate: [(route, state) => roleGuard('admin')(route, state)] },
 
   // Administration
-  { path: 'administration', component: AdministrationComponent, canActivate: [(route, state) => roleGuard('admin')(route, state)] },
+  { path: 'administration', component: AdministrationPageComponent, canActivate: [(route, state) => roleGuard('admin')(route, state)] },
 
   { path: '**', redirectTo: 'dashboard' }
 ];

@@ -1,7 +1,7 @@
 using Dapper;
-using MediCareManager.Core.Entities;
+using MediCareManager.Core.Models;
 using MediCareManager.Core.Exceptions;
-using MediCareManager.Core.Interfaces.Repositories;
+using MediCareManager.Infrastructure.Repositories.Abstractions;
 using MySql.Data.MySqlClient;
 
 namespace MediCareManager.Infrastructure.Repositories;

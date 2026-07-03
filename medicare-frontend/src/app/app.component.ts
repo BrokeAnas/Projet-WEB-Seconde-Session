@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthService } from './core/services/auth.service';
-import { NavbarComponent } from './shared/components/navbar/navbar.component';
+import { AuthStateService } from './services/auth-state.service';
+import { NavbarComponent } from './components/navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
@@ -10,5 +10,5 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
   styleUrl: './app.component.scss'
 })
 export class App {
-  protected readonly authService = inject(AuthService);
+  protected readonly authStateService = inject(AuthStateService);
 }

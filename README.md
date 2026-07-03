@@ -73,37 +73,52 @@ Autres médecins : `dr.dubois@medicare.be`, `dr.leroy@medicare.be`, `dr.lambert@
 
 ## Architecture
 
-### Clean Architecture — 3 projets séparés
+### Clean Architecture — 3 projets séparés (UseCases / Gateways / Repositories)
 
 ```
 MediCareManager.sln
-├── MediCareManager.Core/            ← Domaine (AUCUNE dépendance externe)
-│   ├── Entities/                    ← 13 entités (1 par table)
-│   ├── Interfaces/Repositories/     ← Contrats des repositories
-│   ├── Interfaces/Services/         ← Contrats des services
-│   ├── Services/                    ← Logique métier (Auth, Patient, RDV, …)
-│   ├── DTOs/                        ← DTOs (DataAnnotations, base .NET)
+├── MediCareManager.Core/            ← Domaine (ne connaît ni MySQL ni ASP.NET)
+│   ├── Models/                      ← 13 modèles (1 par table) + DTOs des use cases
+│   ├── IGateways/                   ← Contrats des gateways (portes vers l'Infrastructure)
+│   ├── UseCases/                    ← Logique métier (Auth, Patient, RDV, …)
+│   │   └── Abstractions/            ← Contrats des use cases (injectés dans l'API)
 │   ├── Exceptions/                  ← Exceptions métier
 │   ├── Common/                      ← Validateur NISS, convertisseurs JSON
-│   └── Settings/                    ← JwtSettings
+│   ├── Security/                    ← IPasswordHasher (abstraction)
+│   ├── Settings/                    ← JwtSettings
+│   └── ServiceCollectionExtension   ← AddCoreServices() : DI des use cases
 ├── MediCareManager.Infrastructure/  ← Accès données (référence Core uniquement)
+│   ├── Gateways/                    ← Implémentations des IGateways (reçoivent les repositories)
 │   ├── Repositories/                ← Implémentations Dapper (requêtes paramétrées)
+│   │   └── Abstractions/            ← Contrats des repositories (internes à l'Infrastructure)
 │   ├── Security/                    ← BCryptPasswordHasher
-│   └── Configuration/               ← Connexion MySQL + handlers Dapper
+│   ├── Configuration/               ← Connexion MySQL + handlers Dapper
+│   └── ServiceCollectionExtension   ← AddInfrastructureServices() : DI gateways + repositories
 └── MediCareManager.API/             ← Présentation (référence Core + Infrastructure)
-    ├── Controllers/                 ← Contrôleurs REST (injectent les services)
+    ├── EndPoints/                   ← Minimal API (MapGroup + RequireAuthorization par rôle)
+    ├── Models/                      ← DTOs propres au HTTP (LoginDto, AuthResponseDto, …)
     ├── Middleware/                  ← Traduction exceptions → codes HTTP
-    └── Program.cs                   ← DI, JWT, CORS, JSON snake_case, Swagger
+    └── Program.cs                   ← JWT, CORS, JSON snake_case, Swagger, Map des endpoints
 ```
 
 **Dépendances** : `API → Core, Infrastructure` · `Infrastructure → Core` · `Core → rien d'externe`.
+**Flux d'une requête** : EndPoint → UseCase (Core) → IGateway → Gateway (Infrastructure) → Repository → MySQL.
 
 ### Frontend Angular
 
+```
+src/app/
+├── components/navbar/               ← Barre de navigation (liens filtrés par rôle)
+├── pages/                           ← 15 pages standalone (login-page, dashboard-page, …)
+└── services/
+    ├── auth-state.service.ts        ← État de session (signals token/rôle + hasRole)
+    ├── auth.guard.ts, role.guard.ts ← Protection des routes par rôle
+    ├── auth.interceptor.ts          ← Ajout automatique de « Authorization: Bearer {token} »
+    └── api/                         ← Services HTTP (1 par ressource) + models/
+```
+
 - Composants **standalone**, nouvelle syntaxe **`@if` / `@for` / `@switch`** exclusivement.
 - Gestion d'état **uniquement via Services Angular + `signal()`** (aucun NgRx / Redux).
-- **Guards** (`authGuard`, `roleGuard`) pour la protection des routes par rôle.
-- **Intercepteur HTTP** qui injecte automatiquement `Authorization: Bearer {token}`.
 - Le **JWT est conservé en mémoire** (signal), jamais dans `localStorage`.
 
 ---

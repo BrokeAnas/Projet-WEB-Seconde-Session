@@ -1,22 +1,19 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using MediCareManager.API.EndPoints;
 using MediCareManager.API.Middleware;
-using MediCareManager.Core.Interfaces.Repositories;
-using MediCareManager.Core.Interfaces.Services;
-using MediCareManager.Core.Services;
+using MediCareManager.Core;
 using MediCareManager.Core.Settings;
-using MediCareManager.Infrastructure.Repositories;
-using MediCareManager.Infrastructure.Security;
+using MediCareManager.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ----- Connexion DB (injectée telle quelle dans les repositories Dapper) -----
+// ----- Connexion DB (transmise aux repositories Dapper via l'Infrastructure) -----
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-builder.Services.AddSingleton(connectionString);
 
 // ----- Paramètres JWT (lus depuis appsettings, injectés dans Core) -----
 var jwtSettings = new JwtSettings
@@ -28,34 +25,12 @@ var jwtSettings = new JwtSettings
 };
 builder.Services.AddSingleton(jwtSettings);
 
-// ----- DI : repositories -----
-builder.Services.AddScoped<IPatientRepository, PatientRepository>();
-builder.Services.AddScoped<IMedecinRepository, MedecinRepository>();
-builder.Services.AddScoped<ISecretaireRepository, SecretaireRepository>();
-builder.Services.AddScoped<IAdministrateurRepository, AdministrateurRepository>();
-builder.Services.AddScoped<IRendezVousRepository, RendezVousRepository>();
-builder.Services.AddScoped<IPaiementRepository, PaiementRepository>();
-builder.Services.AddScoped<ISucursaleRepository, SucursaleRepository>();
-builder.Services.AddScoped<ISpecialisationRepository, SpecialisationRepository>();
-builder.Services.AddScoped<IAssuranceRepository, AssuranceRepository>();
-builder.Services.AddScoped<ITypeMaladieRepository, TypeMaladieRepository>();
-builder.Services.AddScoped<IStatsRepository, StatsRepository>();
+// ----- DI : UseCases (Core) + Gateways/Repositories/Sécurité (Infrastructure) -----
+builder.Services.AddCoreServices();
+builder.Services.AddInfrastructureServices(connectionString);
 
-// ----- DI : services métier -----
-builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IPatientService, PatientService>();
-builder.Services.AddScoped<IMedecinService, MedecinService>();
-builder.Services.AddScoped<ISecretaireService, SecretaireService>();
-builder.Services.AddScoped<IRendezVousService, RendezVousService>();
-builder.Services.AddScoped<IPaiementService, PaiementService>();
-builder.Services.AddScoped<ISucursaleService, SucursaleService>();
-builder.Services.AddScoped<ISpecialisationService, SpecialisationService>();
-builder.Services.AddScoped<IAssuranceService, AssuranceService>();
-builder.Services.AddScoped<ITypeMaladieService, TypeMaladieService>();
-builder.Services.AddScoped<IAdminService, AdminService>();
+#region Authentication and Authorization
 
-// ----- Authentification JWT -----
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -76,9 +51,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     });
-// ----- Autorisation -----
-// On ne configure pas de politique d'autorisation spécifique, on se contente d'utiliser les rôles définis dans le JWT.
+
 builder.Services.AddAuthorization();
+
+#endregion
+
+#region Cors
 
 // ----- CORS pour Angular (localhost:4200) -----
 builder.Services.AddCors(options => options.AddPolicy("Angular",
@@ -87,15 +65,18 @@ builder.Services.AddCors(options => options.AddPolicy("Angular",
           .AllowAnyHeader()
           .AllowCredentials()));
 
-// ----- Contrôleurs + sérialisation JSON snake_case (alignée sur les modèles Angular) -----
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-        options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower;
-        // Permet aux propriétés numériques (long) d'être lues depuis une chaîne JSON.
-        options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
-    });
+#endregion
+
+// ----- Sérialisation JSON snake_case des Minimal API (alignée sur les modèles Angular) -----
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+    options.SerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower;
+    // Permet aux propriétés numériques (long) d'être lues depuis une chaîne JSON.
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+});
+
+#region Swagger
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -116,17 +97,31 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityRequirement(new OpenApiSecurityRequirement { [scheme] = Array.Empty<string>() });
 });
 
-// ----- Build & Run -----
+#endregion
+
 var app = builder.Build();
+
 // ----- Middleware -----
 app.UseSwagger();
 app.UseSwaggerUI();
 // Traduction centralisée des exceptions métier en codes HTTP.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-// Redirection automatique vers HTTPS.
 app.UseCors("Angular");
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
-// ----- Run -----
+
+#region Endpoints
+
+app.AddAuthEndPoints();
+app.AddPatientEndPoints();
+app.AddMedecinEndPoints();
+app.AddSecretaireEndPoints();
+app.AddRendezVousEndPoints();
+app.AddPaiementEndPoints();
+app.AddSucursaleEndPoints();
+app.AddReferentielEndPoints();
+app.AddAdminEndPoints();
+
+#endregion
+
 app.Run();

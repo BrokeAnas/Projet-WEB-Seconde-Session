@@ -1,4 +1,4 @@
-using MediCareManager.Core.Interfaces.Services;
+using MediCareManager.Core.Security;
 
 namespace MediCareManager.Infrastructure.Security;
 
