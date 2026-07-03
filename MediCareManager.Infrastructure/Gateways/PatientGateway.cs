@@ -34,19 +34,4 @@ public class PatientGateway : IPatientGateway
 
     public Task<bool> ExistsAsync(long idNat)
         => _patientRepository.ExistsAsync(idNat);
-
-    public Task<IEnumerable<PatientMaladie>> GetMaladiesAsync(long idNat)
-        => _patientRepository.GetMaladiesAsync(idNat);
-
-    public Task AddMaladieAsync(PatientMaladie pm)
-        => _patientRepository.AddMaladieAsync(pm);
-
-    public Task<IEnumerable<PatientAssurance>> GetAssurancesAsync(long idNat)
-        => _patientRepository.GetAssurancesAsync(idNat);
-
-    public Task AddAssuranceAsync(PatientAssurance pa)
-        => _patientRepository.AddAssuranceAsync(pa);
-
-    public Task RemoveAssuranceAsync(long idNat, int idAssurance)
-        => _patientRepository.RemoveAssuranceAsync(idNat, idAssurance);
 }

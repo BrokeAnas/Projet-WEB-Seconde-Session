@@ -6,4 +6,4 @@ public record LoginDto(
     [Required, EmailAddress] string Email,
     [Required] string Password);
 
-public record AuthResponseDto(string Token, string Role, string Nom, string Prenom);
+public record AuthResponseDto(string Token, string Nom, string Prenom);

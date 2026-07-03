@@ -23,24 +23,3 @@ public sealed class LongToStringJsonConverter : JsonConverter<long>
     public override void Write(Utf8JsonWriter writer, long value, JsonSerializerOptions options)
         => writer.WriteStringValue(value.ToString());
 }
-
-/// <summary>Variante pour les identifiants nullables.</summary>
-public sealed class NullableLongToStringJsonConverter : JsonConverter<long?>
-{
-    public override long? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        if (reader.TokenType == JsonTokenType.Null) return null;
-        if (reader.TokenType == JsonTokenType.String)
-        {
-            var s = reader.GetString();
-            return long.TryParse(s, out var value) ? value : null;
-        }
-        return reader.GetInt64();
-    }
-
-    public override void Write(Utf8JsonWriter writer, long? value, JsonSerializerOptions options)
-    {
-        if (value.HasValue) writer.WriteStringValue(value.Value.ToString());
-        else writer.WriteNullValue();
-    }
-}

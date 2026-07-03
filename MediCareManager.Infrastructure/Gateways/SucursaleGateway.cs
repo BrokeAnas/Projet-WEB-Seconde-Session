@@ -19,19 +19,4 @@ public class SucursaleGateway : ISucursaleGateway
 
     public Task<IEnumerable<Sucursale>> GetAllAsync()
         => _sucursaleRepository.GetAllAsync();
-
-    public Task<Sucursale?> GetByIdAsync(int id)
-        => _sucursaleRepository.GetByIdAsync(id);
-
-    public Task<int> CreateAsync(Sucursale sucursale)
-        => _sucursaleRepository.CreateAsync(sucursale);
-
-    public Task UpdateAsync(Sucursale sucursale)
-        => _sucursaleRepository.UpdateAsync(sucursale);
-
-    public Task DeleteAsync(int id)
-        => _sucursaleRepository.DeleteAsync(id);
-
-    public Task<bool> HasPersonnelAsync(int id)
-        => _sucursaleRepository.HasPersonnelAsync(id);
 }

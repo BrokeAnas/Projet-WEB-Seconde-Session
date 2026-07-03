@@ -26,7 +26,6 @@ public static class AuthEndPoints
 
             var response = new AuthResponseDto(
                 Token: token,
-                Role: Claim("role"),
                 Nom: Claim("family_name"),
                 Prenom: Claim("given_name"));
 

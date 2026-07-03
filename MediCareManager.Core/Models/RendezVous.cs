@@ -13,9 +13,6 @@ public class RendezVous
     [JsonConverter(typeof(LongToStringJsonConverter))]
     public long IdNatMedecin { get; set; }
 
-    [JsonConverter(typeof(NullableLongToStringJsonConverter))]
-    public long? IdNatSecretaire { get; set; }
-
     public int IdSucursale { get; set; }
     public DateOnly DateRdv { get; set; }
     public TimeOnly HeureDebut { get; set; }

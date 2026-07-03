@@ -9,27 +9,21 @@ using MediCareManager.Core.UseCases.Abstractions;
 namespace MediCareManager.Core.UseCases;
 
 /// <summary>
-/// Authentifie l'utilisateur (Médecin → Secrétaire → Administrateur) et génère un JWT signé HS256.
+/// Authentifie l'administrateur et génère un JWT signé HS256.
 /// Le JWT est construit uniquement avec des API de base .NET (HMACSHA256), ce qui évite toute
 /// dépendance externe dans la couche Core.
 /// </summary>
 public class AuthUseCases : IAuthUseCases
 {
-    private readonly IMedecinGateway _medecinGateway;
-    private readonly ISecretaireGateway _secretaireGateway;
     private readonly IAdministrateurGateway _administrateurGateway;
     private readonly IPasswordHasher _passwordHasher;
     private readonly JwtSettings _jwt;
 
     public AuthUseCases(
-        IMedecinGateway medecinGateway,
-        ISecretaireGateway secretaireGateway,
         IAdministrateurGateway administrateurGateway,
         IPasswordHasher passwordHasher,
         JwtSettings jwt)
     {
-        _medecinGateway = medecinGateway;
-        _secretaireGateway = secretaireGateway;
         _administrateurGateway = administrateurGateway;
         _passwordHasher = passwordHasher;
         _jwt = jwt;
@@ -37,27 +31,11 @@ public class AuthUseCases : IAuthUseCases
 
     public async Task<string?> LoginAsync(string email, string password)
     {
-        var medecin = await _medecinGateway.GetByEmailAsync(email);
-        if (medecin is not null)
-        {
-            return _passwordHasher.Verify(password, medecin.MotDePasse)
-                ? GenerateToken(medecin.IdNat.ToString(), "medecin", medecin.Prenom, medecin.Nom, medecin.IdSucursale)
-                : null;
-        }
-
-        var secretaire = await _secretaireGateway.GetByEmailAsync(email);
-        if (secretaire is not null)
-        {
-            return _passwordHasher.Verify(password, secretaire.MotDePasse)
-                ? GenerateToken(secretaire.IdNat.ToString(), "secretaire", secretaire.Prenom, secretaire.Nom, secretaire.IdSucursale)
-                : null;
-        }
-
         var admin = await _administrateurGateway.GetByEmailAsync(email);
         if (admin is not null)
         {
             return _passwordHasher.Verify(password, admin.MotDePasse)
-                ? GenerateToken(admin.IdAdmin.ToString(), "admin", admin.Prenom, admin.Nom, null)
+                ? GenerateToken(admin.IdAdmin.ToString(), admin.Prenom, admin.Nom)
                 : null;
         }
 
@@ -65,7 +43,7 @@ public class AuthUseCases : IAuthUseCases
         return null;
     }
 
-    private string GenerateToken(string sub, string role, string prenom, string nom, int? sucursale)
+    private string GenerateToken(string sub, string prenom, string nom)
     {
         var now = DateTimeOffset.UtcNow;
         var exp = now.AddHours(_jwt.ExpiryHours);
@@ -79,7 +57,6 @@ public class AuthUseCases : IAuthUseCases
         var payload = new Dictionary<string, object>
         {
             ["sub"] = sub,
-            ["role"] = role,
             ["given_name"] = prenom,
             ["family_name"] = nom,
             ["iss"] = _jwt.Issuer,
@@ -88,7 +65,6 @@ public class AuthUseCases : IAuthUseCases
             ["nbf"] = now.ToUnixTimeSeconds(),
             ["exp"] = exp.ToUnixTimeSeconds()
         };
-        if (sucursale.HasValue) payload["sucursale"] = sucursale.Value;
 
         var headerSegment = Base64UrlEncode(JsonSerializer.SerializeToUtf8Bytes(header));
         var payloadSegment = Base64UrlEncode(JsonSerializer.SerializeToUtf8Bytes(payload));

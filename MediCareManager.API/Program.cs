@@ -34,7 +34,7 @@ builder.Services.AddInfrastructureServices(connectionString);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        // On conserve les noms de claims tels quels ("role", "sub").
+        // On conserve les noms de claims tels quels ("sub").
         options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -46,7 +46,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
-            RoleClaimType = "role",
             NameClaimType = "sub",
             ClockSkew = TimeSpan.FromMinutes(1)
         };
@@ -115,12 +114,8 @@ app.UseAuthorization();
 app.AddAuthEndPoints();
 app.AddPatientEndPoints();
 app.AddMedecinEndPoints();
-app.AddSecretaireEndPoints();
-app.AddRendezVousEndPoints();
-app.AddPaiementEndPoints();
 app.AddSucursaleEndPoints();
-app.AddReferentielEndPoints();
-app.AddAdminEndPoints();
+app.AddRendezVousEndPoints();
 
 #endregion
 

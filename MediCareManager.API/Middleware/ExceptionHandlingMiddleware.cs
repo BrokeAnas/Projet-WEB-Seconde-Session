@@ -34,14 +34,11 @@ public class ExceptionHandlingMiddleware
     {
         var (status, message) = ex switch
         {
-            DomainValidationException        => (StatusCodes.Status400BadRequest, ex.Message),
-            NotFoundException                => (StatusCodes.Status404NotFound,   ex.Message),
-            RendezVousConflitException       => (StatusCodes.Status409Conflict,   ex.Message),
-            MedecinHasRendezVousException    => (StatusCodes.Status409Conflict,   ex.Message),
-            SucursaleHasPersonnelException   => (StatusCodes.Status409Conflict,   ex.Message),
-            IdNatAlreadyExistsException      => (StatusCodes.Status409Conflict,   ex.Message),
-            EmailAlreadyExistsException      => (StatusCodes.Status409Conflict,   ex.Message),
-            _                                => (StatusCodes.Status500InternalServerError, "Erreur interne du serveur")
+            DomainValidationException   => (StatusCodes.Status400BadRequest, ex.Message),
+            NotFoundException           => (StatusCodes.Status404NotFound,   ex.Message),
+            RendezVousConflitException  => (StatusCodes.Status409Conflict,   ex.Message),
+            IdNatAlreadyExistsException => (StatusCodes.Status409Conflict,   ex.Message),
+            _                           => (StatusCodes.Status500InternalServerError, "Erreur interne du serveur")
         };
 
         if (status == StatusCodes.Status500InternalServerError)

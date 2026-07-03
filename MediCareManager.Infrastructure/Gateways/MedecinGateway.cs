@@ -17,24 +17,6 @@ public class MedecinGateway : IMedecinGateway
         _medecinRepository = medecinRepository ?? throw new ArgumentNullException(nameof(medecinRepository));
     }
 
-    public Task<IEnumerable<Medecin>> GetAllAsync(string? search = null)
-        => _medecinRepository.GetAllAsync(search);
-
-    public Task<Medecin?> GetByIdAsync(long idNat)
-        => _medecinRepository.GetByIdAsync(idNat);
-
-    public Task<Medecin?> GetByEmailAsync(string email)
-        => _medecinRepository.GetByEmailAsync(email);
-
-    public Task<long> CreateAsync(Medecin medecin)
-        => _medecinRepository.CreateAsync(medecin);
-
-    public Task UpdateAsync(Medecin medecin)
-        => _medecinRepository.UpdateAsync(medecin);
-
-    public Task DeleteAsync(long idNat)
-        => _medecinRepository.DeleteAsync(idNat);
-
-    public Task<bool> HasRendezVousFutursAsync(long idNat)
-        => _medecinRepository.HasRendezVousFutursAsync(idNat);
+    public Task<IEnumerable<Medecin>> GetAllAsync()
+        => _medecinRepository.GetAllAsync();
 }
