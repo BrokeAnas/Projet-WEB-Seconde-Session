@@ -2,17 +2,10 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import {
-  CreateRendezVousDto,
-  RendezVous,
-  StatutRdv,
-  UpdateRendezVousDto
-} from './models/rendezvous.model';
+import { CreateRendezVousDto, RendezVous, StatutRdv } from './models/rendezvous.model';
 
 export interface RendezVousFiltres {
   medecinId?: string;
-  patientId?: string;
-  sucursaleId?: number;
   date?: string;
 }
 
@@ -29,20 +22,21 @@ export class RendezVousService {
   loadRendezVous(filtres: RendezVousFiltres = {}): void {
     this.isLoading.set(true);
     this.error.set(null);
+
     let params = new HttpParams();
     if (filtres.medecinId) params = params.set('medecinId', filtres.medecinId);
-    if (filtres.patientId) params = params.set('patientId', filtres.patientId);
-    if (filtres.sucursaleId != null) params = params.set('sucursaleId', filtres.sucursaleId);
     if (filtres.date) params = params.set('date', filtres.date);
 
     this.http.get<RendezVous[]>(this.apiUrl, { params }).subscribe({
-      next: (data) => { this.rendezVousSignal.set(data); this.isLoading.set(false); },
-      error: (err) => { this.error.set(err.error?.error ?? 'Erreur de chargement'); this.isLoading.set(false); }
+      next: rdvs => {
+        this.rendezVousSignal.set(rdvs);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.error.set('Impossible de charger les rendez-vous.');
+        this.isLoading.set(false);
+      }
     });
-  }
-
-  getById(id: number): Observable<RendezVous> {
-    return this.http.get<RendezVous>(`${this.apiUrl}/${id}`);
   }
 
   create(dto: CreateRendezVousDto): Observable<RendezVous> {
@@ -51,23 +45,10 @@ export class RendezVousService {
     );
   }
 
-  update(id: number, dto: UpdateRendezVousDto): Observable<RendezVous> {
-    return this.http.put<RendezVous>(`${this.apiUrl}/${id}`, dto).pipe(
-      tap(updated => this.rendezVousSignal.update(list =>
-        list.map(r => r.id_rdv === id ? updated : r)))
-    );
-  }
-
   updateStatut(id: number, statut: StatutRdv): Observable<RendezVous> {
     return this.http.patch<RendezVous>(`${this.apiUrl}/${id}/statut`, { statut }).pipe(
       tap(updated => this.rendezVousSignal.update(list =>
         list.map(r => r.id_rdv === id ? updated : r)))
-    );
-  }
-
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
-      tap(() => this.rendezVousSignal.update(list => list.filter(r => r.id_rdv !== id)))
     );
   }
 }

@@ -13,7 +13,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PatientService } from '../../services/api/patient.service';
-import { AuthStateService } from '../../services/auth-state.service';
 import { Patient } from '../../services/api/models/patient.model';
 
 @Component({
@@ -28,7 +27,6 @@ import { Patient } from '../../services/api/models/patient.model';
 })
 export class PatientsPageComponent implements OnInit {
   readonly patientService = inject(PatientService);
-  readonly authStateService = inject(AuthStateService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly snackBar = inject(MatSnackBar);
@@ -42,10 +40,6 @@ export class PatientsPageComponent implements OnInit {
       distinctUntilChanged(),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(term => this.patientService.loadPatients(term ?? ''));
-  }
-
-  voir(id: string): void {
-    this.router.navigate(['/patients', id]);
   }
 
   editer(id: string): void {

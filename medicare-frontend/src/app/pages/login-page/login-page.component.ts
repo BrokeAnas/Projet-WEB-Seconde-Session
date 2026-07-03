@@ -51,7 +51,7 @@ export class LoginPageComponent {
     this.authStateService.login(this.form.getRawValue()).subscribe({
       next: () => {
         this.loading.set(false);
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/patients']);
       },
       error: (err) => {
         this.loading.set(false);

@@ -11,7 +11,6 @@ import { PatientService } from '../../services/api/patient.service';
 import { MedecinService } from '../../services/api/medecin.service';
 import { SucursaleService } from '../../services/api/sucursale.service';
 import { RendezVousService } from '../../services/api/rendez-vous.service';
-import { AuthStateService } from '../../services/auth-state.service';
 import { Patient } from '../../services/api/models/patient.model';
 
 @Component({
@@ -30,7 +29,6 @@ export class RendezVousFormPageComponent implements OnInit {
   readonly medecinService = inject(MedecinService);
   readonly sucursaleService = inject(SucursaleService);
   private readonly rendezVousService = inject(RendezVousService);
-  private readonly authStateService = inject(AuthStateService);
   private readonly dialogRef = inject(MatDialogRef<RendezVousFormPageComponent>);
 
   readonly saving = signal(false);
@@ -91,7 +89,6 @@ export class RendezVousFormPageComponent implements OnInit {
     this.rendezVousService.create({
       id_nat_patient: patient.id_nat,
       id_nat_medecin: v.id_nat_medecin,
-      id_nat_secretaire: this.authStateService.role() === 'secretaire' ? (this.authStateService.userId() ?? undefined) : undefined,
       id_sucursale: v.id_sucursale,
       date_rdv: v.date_rdv,
       heure_debut: this.fullTime(v.heure_debut),

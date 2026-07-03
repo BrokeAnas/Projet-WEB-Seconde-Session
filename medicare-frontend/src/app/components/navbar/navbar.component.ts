@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,15 +14,6 @@ import { AuthStateService } from '../../services/auth-state.service';
 })
 export class NavbarComponent {
   readonly authStateService = inject(AuthStateService);
-
-  readonly roleLabel = computed(() => {
-    switch (this.authStateService.role()) {
-      case 'admin': return 'Administrateur';
-      case 'medecin': return 'Médecin';
-      case 'secretaire': return 'Secrétaire';
-      default: return '';
-    }
-  });
 
   logout(): void {
     this.authStateService.logout();
