@@ -2,6 +2,7 @@
 --  MediCare Manager (version simplifiée) - Données de test
 --  Compte de test : admin@medicare.be / Admin1234!
 -- =============================================================
+SET NAMES utf8mb4;
 USE medconnect;
 
 -- ---------- Spécialisations ----------

@@ -3,24 +3,12 @@
 --  Gestion de patients et de rendez-vous d'un réseau de cabinets
 -- =============================================================
 
-CREATE DATABASE IF NOT EXISTS medconnect CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE medconnect;
+SET NAMES utf8mb4;
 
--- On repart d'une base propre (l'ordre respecte les clés étrangères).
-DROP TABLE IF EXISTS RendezVous;
-DROP TABLE IF EXISTS Patient;
-DROP TABLE IF EXISTS Medecin;
-DROP TABLE IF EXISTS Administrateur;
-DROP TABLE IF EXISTS Sucursale;
-DROP TABLE IF EXISTS SpecialisationMedecin;
--- Tables héritées d'anciennes versions du schéma, supprimées si présentes.
-DROP TABLE IF EXISTS Paiement_Historique;
-DROP TABLE IF EXISTS Paiement;
-DROP TABLE IF EXISTS PatientMaladie;
-DROP TABLE IF EXISTS PatientAssurance;
-DROP TABLE IF EXISTS TypeMaladie;
-DROP TABLE IF EXISTS Assurance;
-DROP TABLE IF EXISTS Secretaire;
+-- On repart d'une base propre à chaque exécution du script.
+DROP DATABASE IF EXISTS medconnect;
+CREATE DATABASE medconnect CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE medconnect;
 
 CREATE TABLE SpecialisationMedecin (
   id_specialisation INT PRIMARY KEY AUTO_INCREMENT,
